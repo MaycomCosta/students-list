@@ -35,16 +35,15 @@ export const Container = styled.div`
   .buttonInfo {
     border: none;
     cursor: pointer;
-    color: #ff9001;
-    background-color: #ffffff;
+    color: #ffffff;
+    background-color: #ff9001;
     transition: all 0.3s linear 0s;
     height: 40px;
     width: 100px;
     border-radius: 5px;
 
     &:hover {
-      color: #ffffff;
-      background-color: #ff9001;
+      opacity: 0.7;
     }
   }
 
@@ -57,11 +56,6 @@ export const Content = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  /*align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 0 20px; */
 
   .studentInfo {
     display: flex;

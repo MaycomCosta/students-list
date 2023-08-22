@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Modal } from '../'
 import courses from '../../data/data'
@@ -6,22 +6,32 @@ import * as C from './styles'
 
 export function StudentsCard({ student }) {
   const [showModal, setShowModal] = useState(false)
+  const [myCourse, setMyCourse] = useState(false)
 
-  function generateRandomCourse() {
-    const randomIndex = Math.floor(Math.random() * courses.length)
-    return courses[randomIndex]
-  }
+  useEffect(() => {
+    function generateRandomCourse() {
+      const randomIndex = Math.floor(Math.random() * courses.length)
+      return setMyCourse(courses[randomIndex])
+    }
+    generateRandomCourse()
+  }, [])
 
   return (
     <>
       <C.Container>
-        {showModal && <Modal student={student} setShowModal={setShowModal} />}
+        {showModal && (
+          <Modal
+            myCourse={myCourse}
+            student={student}
+            setShowModal={setShowModal}
+          />
+        )}
         <C.Content>
           <div className="studentInfo">
             <h3>{`${student.name.first} ${student.name.last}`}</h3>
-            <h4>Course: {generateRandomCourse()}</h4>
+            <h4>Course: {myCourse}</h4>
             <p>Age: {student.dob.age}</p>
-            <p>State: {student.location.country}</p>
+            <p>Country: {student.location.country}</p>
           </div>
 
           <div className="button">

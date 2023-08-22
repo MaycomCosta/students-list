@@ -1,23 +1,41 @@
-// import { useState } from 'react'
-import { useQuery } from 'react-query'
+import { useMemo } from 'react'
+import { useInfiniteQuery } from 'react-query'
 
 import { StudentsCard } from '../'
-import { api } from '../../api/api'
 import * as C from './styles.js'
+const URL = 'https://randomuser.me/api/'
+
+async function getStudents({ pageParam }) {
+  return await fetch(`${URL}?page=${pageParam}&results=5`).then((res) =>
+    res.json()
+  )
+}
 
 export function StudentsList() {
-  const { data, isError, isLoading } = useQuery(
+  const {
+    data,
+    isError,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteQuery(
     'students-list',
-    api.getStudents
+    ({ pageParam = 1 }) => getStudents({ pageParam }),
+    {
+      getNextPageParam: (lastPage, allPages) => {
+        return lastPage.results.length ? allPages.length + 1 : undefined
+      }
+    }
   )
 
-  // console.log(data)
+  const items = useMemo(() => {
+    return data?.pages.reduce((acc, page) => {
+      // console.log(acc, page.results)
+      return [...acc, ...page.results]
+    }, [])
+  }, [data])
 
-  // const [displayedStudents, setDisplayedStudents] = useState(5)
-
-  // const loadMoreStudents = () => {
-  //   setDisplayedStudents(displayedStudents + 5)
-  // }
   return (
     <C.Container>
       <h1>Students List</h1>
@@ -25,13 +43,17 @@ export function StudentsList() {
       {isError && (
         <h3 className="loadingAndError">Ocorreu algum problema :(</h3>
       )}
-      {data &&
-        data
-          // .slice(0, displayedStudents)
-          .map((student) => (
+      <C.Content isLoading={isLoading} isError={isError}>
+        {items &&
+          items.map((student) => (
             <StudentsCard key={student.login.uuid} student={student} />
           ))}
-      {/* <button onClick={loadMoreStudents}>Carregar mais</button> */}
+      </C.Content>
+      {hasNextPage && (
+        <C.Button onClick={fetchNextPage} disabled={isFetchingNextPage}>
+          {isFetchingNextPage ? 'Carregando...' : 'Carregar Mais'}
+        </C.Button>
+      )}
     </C.Container>
   )
 }
